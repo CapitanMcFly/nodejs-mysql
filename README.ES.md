@@ -40,3 +40,11 @@ Para que se pueda establecer la conexión con la base de datos MySQL desde node,
 usuario@servidor:~$ cd nodejs-mysql
 usuario@servidor:~/nodejs-mysql$ node server.js
 ```
+
+- **API REST:**
+
+GET http://server:8090/api/cities -> Devuelve todas las ciudades  
+GET http://server:8090/api/cities/id -> Devuelve la ciudad que coincide con el id  
+POST http://server:8090/api/cities -> Inserta una ciudad con los parámetros que se indican en el body de la petición y devuelve su ID  
+PUT http://server:8090/api/cities/id -> Actualiza la ciudad que coincide con el id con los parámetros indicados en el body de la petición  
+DELETE http://server:8090/api/cities/id -> Borra la ciudad que coincide con el id

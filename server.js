@@ -19,53 +19,103 @@ var connection = mysql.createConnection({
 	ssl      : { ca: fs.readFileSync('./ssl/server-ca.pem') }
 });
 connection.connect(function(err) {
-  if (err){
+	if (err){
 		log.error("MySQL connection KO...");
-    throw err;
-  }
+		throw err;
+	}
 	log.info("MySQL connection OK!");
 });
 
-// routes will go here
-// GET http://localhost:8090/api/cities
-app.get('/api/cities', function(req, res) {
-  // var user_id = req.param('id');
-  // var token = req.param('token');
-  // var geo = req.param('geo');
-  // res.send(user_id + ' ' + token + ' ' + geo);
 
-  connection.query('select * from cities', function (error, results, fields) {
-  	if(error){
+// GET http://localhost:8090/api/cities
+// Returns all cities
+app.get('/api/cities', function(req, res) {
+	// var user_id = req.param('id');
+	// var token = req.param('token');
+	// var geo = req.param('geo');
+	// res.send(user_id + ' ' + token + ' ' + geo);
+
+	connection.query('select * from cities', function (error, results, fields) {
+		if(error){
 			log.error("GET /api/cities from " + req.ip);
-      //If there is error, we send the error in the error section with 500 status
-      res.send(JSON.stringify({"status": 500, "error": error, "response": null}));
-  	} else {
+			//If there is error, we send the error in the error section with 500 status
+			res.send(JSON.stringify({"status": 500, "error": error, "response": null}));
+		} else {
 			log.info("GET /api/cities from " + req.ip);
-      //If there is no error, all is good and response is 200OK.
-      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
-  	}
-  });
+			//If there is no error, all is good and response is 200 OK.
+			res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+		}
+	});
+});
+
+// GET http://localhost:8090/api/cities/id
+// Returns the city that matches the id
+app.get('/api/cities/:id', function(req, res) {
+	connection.query('select * from cities where ID = ?', req.params.id, function (error, results, fields) {
+		if(error){
+			log.error("GET /api/cities/" + req.params.id + " from " + req.ip);
+			//If there is error, we send the error in the error section with 500 status
+			res.send(JSON.stringify({"status": 500, "error": error, "response": null}));
+		} else {
+			log.info("GET /api/cities/" + req.params.id + " from " + req.ip);
+			//If there is no error, all is good and response is 200 OK.
+			res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+		}
+	});
 });
 
 // POST http://localhost:8090/api/cities
+// Inserts a city with the parameters indicated in the request's body and returns its ID
 app.post('/api/cities', function(req, res) {
-  // var user_id = req.body.id;
-  // var token = req.body.token;
-  // var geo = req.body.geo;
-  // res.send(user_id + ' ' + token + ' ' + geo);
+	// var user_id = req.body.id;
+	// var token = req.body.token;
+	// var geo = req.body.geo;
+	// res.send(user_id + ' ' + token + ' ' + geo);
 
-  var sql = "INSERT INTO cities SET ?";
-  connection.query(sql, req.body, function (error, results, fields) {
-  	if(error){
+	var sql = "INSERT INTO cities SET ?";
+	connection.query(sql, req.body, function (error, results, fields) {
+		if(error){
 			log.error("POST /api/cities from " + req.ip);
-      //If there is error, we send the error in the error section with 500 status
-      res.send(JSON.stringify({"status": 500, "error": error, "response": null}));
-  	} else {
+			//If there is error, we send the error in the error section with 500 status
+			res.send(JSON.stringify({"status": 500, "error": error, "response": null}));
+		} else {
 			log.info("POST /api/cities from " + req.ip);
-      //If there is no error, all is good and response is 200OK.
-      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
-  	}
-  });
+			//If there is no error, all is good and response is 201 Created.
+			res.send(JSON.stringify({"status": 201, "error": null, "response": results}));
+		}
+	});
+});
+
+// PUT http://localhost:8090/api/cities/id
+// Updates the city that matches the id with the parameters indicated in the request's body
+app.put('/api/cities/:id', function(req, res) {
+	connection.query('update cities set ? where ID = ?', [req.body, req.params.id], function (error, results, fields) {
+		if(error){
+			log.error("PUT /api/cities/" + req.params.id + " from " + req.ip);
+			//If there is error, we send the error in the error section with 500 status
+			res.send(JSON.stringify({"status": 500, "error": error, "response": null}));
+		} else {
+			log.info("PUT /api/cities/" + req.params.id + " from " + req.ip);
+			//If there is no error, all is good and response is 200 OK.
+			res.send(JSON.stringify({"status": 200, "error": null, "response": results.message}));
+		}
+	});
+});
+
+// DELETE http://localhost:8090/api/cities/id
+// Deletes the city that matches the id
+app.delete('/api/cities/:id', function(req, res) {
+	connection.query('delete from cities where ID = ?', req.params.id, function (error, results, fields) {
+		if(error){
+			log.error("DELETE /api/cities/" + req.params.id + " from " + req.ip);
+			//If there is error, we send the error in the error section with 500 status
+			res.send(JSON.stringify({"status": 500, "error": error, "response": null}));
+		} else {
+			log.info("DELETE /api/cities/" + req.params.id + " from " + req.ip);
+			//If there is no error, all is good and response is 204 No Content.
+			res.send(JSON.stringify({"status": 204, "error": null, "response": "No Content"}));
+		}
+	});
 });
 
 // start the server
