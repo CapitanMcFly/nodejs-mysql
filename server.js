@@ -3,7 +3,8 @@ var express = require('express');
 var app = express();
 var port = process.env.PORT || 8090;
 var bodyParser = require('body-parser');
-var mysql= require('mysql');
+var mysql = require('mysql');
+var fs = require('fs');
 var logopts = { logFilePath:'backend.log', timestampFormat:'DD-MM-YYYY HH:mm:ss.SSS' };
 var log = require('simple-node-logger').createSimpleFileLogger(logopts);
 
@@ -14,7 +15,8 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 var connection = mysql.createConnection({
 	host     : 'localhost',
 	user     : 'prueba',
-	database : 'prueba'
+	database : 'prueba',
+	ssl      : { ca: fs.readFileSync('./ssl/server-ca.pem') }
 });
 connection.connect(function(err) {
   if (err){
